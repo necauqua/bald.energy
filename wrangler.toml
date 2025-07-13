@@ -1,0 +1,19 @@
+name = "bald-energy"
+main = "src/index.ts"
+compatibility_date = "2025-07-09"
+
+[vars]
+ELASTICSEARCH_URL = "https://elastic.necauq.ua"
+ELASTICSEARCH_INDEX = "twitch-chat-dunkorslam"
+
+[[routes]]
+custom_domain = true
+pattern = "bald.energy"
+
+[[durable_objects.bindings]]
+name = "ELASTICSEARCH_COUNTER"
+class_name = "ElasticsearchCounter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ElasticsearchCounter"]

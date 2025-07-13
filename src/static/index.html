@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>dunk.energy</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 50px auto;
+                padding: 20px;
+                background: #f5f5f5;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+            .counts-row {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1.5em;
+                margin: 20px 0 0 0;
+            }
+            .count {
+                font-size: 2.5em;
+                font-weight: bold;
+                color: #333;
+            }
+            .delimiter {
+                font-size: 2em;
+                color: #bbb;
+                margin: 0 0.5em;
+            }
+            .total-count {
+                font-size: 1.2em;
+                color: #666;
+                margin: 10px 0 20px 0;
+            }
+            .weeb-ratio {
+                color: #666;
+                margin: 10px 0 20px 0;
+            }
+            .status {
+                margin: 10px 0;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            .connected {
+                background: #d4edda;
+                color: #155724;
+            }
+            .disconnected {
+                background: #f8d7da;
+                color: #721c24;
+            }
+            .error {
+                background: #fff3cd;
+                color: #856404;
+            }
+            .count-container {
+                display: flex;
+                align-items: center;
+            }
+            .count-label {
+                margin-right: 1rem;
+            }
+            footer {
+                font-size: 0.8rem;
+                margin-top: 2rem;
+                color: #666;
+            }
+            .leaderboards {
+                display: flex;
+                gap: 2rem;
+                margin-top: 20px;
+            }
+            .leaderboard {
+                flex: 1;
+            }
+            .leaderboard h3 {
+                margin: 0 0 15px 0;
+                color: #333;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+            th,
+            td {
+                padding: 8px 12px;
+                text-align: left;
+                border-bottom: 1px solid #eee;
+            }
+            th:first-child {
+                text-align: center;
+            }
+            th {
+                background: #f8f9fa;
+                font-weight: bold;
+                color: #333;
+            }
+            td:first-child {
+                width: 30px;
+                text-align: center;
+                font-weight: bold;
+                color: #666;
+            }
+            td:last-child {
+                text-align: right;
+                font-weight: bold;
+                color: #333;
+            }
+            tbody tr:hover {
+                background: #f8f9fa;
+            }
+            @media (max-width: 768px) {
+                .leaderboards {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+            }
+            a {
+                color: #334;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>DunkOrSlam chat weeb levels or some shit</h1>
+            <div id="status" class="status error" style="display: none"></div>
+            <div class="counts-row">
+                <div class="count-container">
+                    <span class="count-label">!uguu:</span>
+                    <span class="count" id="uguu-count">-</span>
+                </div>
+                <span class="delimiter">|</span>
+                <div class="count-container">
+                    <span class="count-label">!punch:</span>
+                    <span class="count" id="punch-count">-</span>
+                </div>
+            </div>
+            <div class="weeb-ratio" id="ratio">weeb ratio: -</div>
+            <div class="total-count" id="count">total: -</div>
+            <footer>
+                Tracks the precise amount of '!uguu' and '!punch' messages since
+                the <abbr title="circa 2025-07-06">moment</abbr> I started
+                archiving chat.<br />
+                Thanks <abbr title="who else lul">myndzi</abbr> for providing
+                relatively accurate historical data from before that.
+            </footer>
+        </div>
+
+        <div
+            id="top-container"
+            class="container"
+            style="margin-top: 1rem; display: none"
+        >
+            <h2>Tops (not <abbr title="idk about weebs tho">bottoms</abbr>)</h2>
+            <div class="leaderboards">
+                <div class="leaderboard">
+                    <h3>Weebs</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uguu-leaderboard">
+                            <tr>
+                                <td>1</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="leaderboard">
+                    <h3>Defenders</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="punch-leaderboard">
+                            <tr>
+                                <td>1</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>-</td>
+                                <td>-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script>
+            const statusEl = document.getElementById('status');
+            const countEl = document.getElementById('count');
+            const uguuCountEl = document.getElementById('uguu-count');
+            const punchCountEl = document.getElementById('punch-count');
+            const ratioEl = document.getElementById('ratio');
+            const topContainerEl = document.getElementById('top-container');
+            const uguuLeaderboardEl =
+                document.getElementById('uguu-leaderboard');
+            const punchLeaderboardEl =
+                document.getElementById('punch-leaderboard');
+
+            function showError(message) {
+                statusEl.textContent = message;
+                statusEl.className = 'status error';
+                statusEl.style.display = '';
+            }
+
+            function hideStatus() {
+                statusEl.style.display = 'none';
+            }
+
+            function connect() {
+                const protocol =
+                    location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const ws = new WebSocket(
+                    `${protocol}//${location.host}/websocket`,
+                );
+
+                ws.onopen = () => hideStatus();
+
+                function update(el, value, prefix = '') {
+                    if (el._lastValue && value && value - el._lastValue > 1) {
+                        const from = el._lastValue;
+                        const diff = value - from;
+                        for (let i = 0; i < diff; i++) {
+                            setTimeout(
+                                () => {
+                                    const currentValue = (
+                                        from +
+                                        i +
+                                        1
+                                    ).toLocaleString();
+                                    el.textContent = prefix + currentValue;
+                                },
+                                ((i + 0.5) * 1000) / diff,
+                            );
+                        }
+                    } else {
+                        el.textContent =
+                            value !== undefined
+                                ? prefix + value.toLocaleString()
+                                : prefix + '-';
+                    }
+                    el._lastValue = value;
+                }
+
+                function renderLeaderboard(tbodyEl, topList) {
+                    tbodyEl.innerHTML = '';
+                    topList.forEach(([name, count], idx) => {
+                        const tr = document.createElement('tr');
+                        const tdRank = document.createElement('td');
+                        const tdName = document.createElement('td');
+                        const tdCount = document.createElement('td');
+                        const link = document.createElement('a');
+                        link.textContent = name;
+                        link.target = '_blank';
+                        link.href = `https://twitch.tv/${name}`;
+                        tdRank.textContent = idx + 1;
+                        tdName.appendChild(link);
+                        tdCount.textContent = count.toLocaleString();
+                        tr.appendChild(tdRank);
+                        tr.appendChild(tdName);
+                        tr.appendChild(tdCount);
+                        tbodyEl.appendChild(tr);
+                    });
+                }
+
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+
+                    if (data.type === 'update') {
+                        topContainerEl.style.display = '';
+
+                        update(uguuCountEl, data.uguuCount);
+                        update(punchCountEl, data.punchCount);
+                        update(countEl, data.totalCount, 'total: ');
+
+                        const ratio =
+                            data.punchCount > 0
+                                ? (data.uguuCount / data.punchCount).toFixed(2)
+                                : '∞';
+                        ratioEl.textContent = 'weeb ratio: ' + ratio;
+
+                        renderLeaderboard(uguuLeaderboardEl, data.uguuTop);
+                        renderLeaderboard(punchLeaderboardEl, data.punchTop);
+
+                        hideStatus();
+                    } else if (data.type === 'error') {
+                        showError(`Error: ${data.message}`);
+                    }
+                };
+
+                ws.onclose = () => {
+                    showError('Disconnected - Reconnecting...');
+                    setTimeout(connect, 3000);
+                };
+
+                ws.onerror = () => {
+                    showError('Connection Error');
+                };
+            }
+
+            connect();
+        </script>
+    </body>
+</html>

@@ -322,13 +322,22 @@
                 statusEl.style.display = 'none';
             }
 
-            function connect() {
-                const protocol =
-                    location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const ws = new WebSocket(
-                    `${protocol}//${location.host}/websocket`,
-                );
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            let ws;
 
+            function disconnect() {
+                if (!ws) return;
+                ws.onclose = undefined;
+                ws.onerror = undefined;
+                ws.close();
+                ws = undefined;
+            }
+
+            window.onbeforeunload = disconnect;
+
+            function connect() {
+                disconnect();
+                ws = new WebSocket(`${protocol}//${location.host}/websocket`);
                 ws.onopen = () => hideStatus();
 
                 function update(el, value, prefix = '') {
@@ -399,19 +408,35 @@
 
                         hideStatus();
                     } else if (data.type === 'error') {
+                        console.log('server error', data.message);
                         showError(`Error: ${data.message}`);
                     }
                 };
 
-                ws.onclose = () => {
+                ws.onclose = (e) => {
+                    console.log('disconnected', e);
                     showError('Disconnected - Reconnecting...');
                     setTimeout(connect, 3000);
                 };
 
-                ws.onerror = () => {
+                ws.onerror = (e) => {
+                    console.log('connection error', e);
                     showError('Connection Error');
                 };
             }
+
+            document.addEventListener("visibilitychange", () => {
+                if (!document.hidden) {
+                    if (!ws) {
+                        connect();
+                    }
+                    return;
+                }
+                if (ws) {
+                    disconnect();
+                    showError('Disconnected, browser tab not visible');
+                }
+            });
 
             connect();
         </script>

@@ -87,7 +87,7 @@ export class ElasticsearchCounter extends DurableObject<Env> {
               top_names: {
                 terms: {
                   field: 'name',
-                  size: 10,
+                  size: 25,
                 },
               },
             }
@@ -116,6 +116,15 @@ export class ElasticsearchCounter extends DurableObject<Env> {
         true,
       );
 
+      const magikarpSearchQuery = countQuery(
+        {
+          bool: {
+            must: [privmsg, { prefix: { 'message.keyword': '!magikarp' } }],
+          },
+        },
+        true,
+      );
+
       // make 1 request instead of 3 to reduce outgoing requests for cf
       const response = await fetch(
         `${this.env.ELASTICSEARCH_URL}/${this.env.ELASTICSEARCH_INDEX}/_msearch`,
@@ -132,6 +141,8 @@ export class ElasticsearchCounter extends DurableObject<Env> {
             JSON.stringify(uguuSearchQuery) +
             '\n{}\n' +
             JSON.stringify(punchSearchQuery) +
+            '\n{}\n' +
+            JSON.stringify(magikarpSearchQuery) +
             '\n',
         },
       );
@@ -145,18 +156,23 @@ export class ElasticsearchCounter extends DurableObject<Env> {
 
       const data = (await response.json()) as any;
 
-      const [totalResponse, uguuResponse, punchResponse] = data.responses;
+      const [totalResponse, uguuResponse, punchResponse, magikarpResponse] = data.responses;
 
       this.broadcast({
         type: 'update',
         totalCount: totalResponse.hits.total.value + PRE_GENESIS_TOTAL,
         uguuCount: uguuResponse.hits.total.value + PRE_GENESIS_UGUU,
         punchCount: punchResponse.hits.total.value + PRE_GENESIS_PUNCH,
+        magikarpCount: magikarpResponse.hits.total.value,
         uguuTop: uguuResponse.aggregations.top_names.buckets.map((b: any) => [
           b.key,
           b.doc_count,
         ]),
         punchTop: punchResponse.aggregations.top_names.buckets.map((b: any) => [
+          b.key,
+          b.doc_count,
+        ]),
+        magikarpTop: magikarpResponse.aggregations.top_names.buckets.map((b: any) => [
           b.key,
           b.doc_count,
         ]),

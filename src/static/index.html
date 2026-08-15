@@ -319,29 +319,31 @@
       ws.onopen = () => hideStatus();
 
       function update(el, value, prefix = '') {
-        if (el._lastValue && value && value - el._lastValue > 1) {
-          const from = el._lastValue;
-          const diff = value - from;
-          for (let i = 0; i < diff; i++) {
-            setTimeout(
-              () => {
-                const currentValue = (
-                  from +
-                  i +
-                  1
-                ).toLocaleString();
-                el.textContent = prefix + currentValue;
-              },
-              ((i + 0.5) * 1000) / diff,
-            );
+        cancelAnimationFrame(el._animationFrame);
+
+        const from = el._lastValue;
+        el._lastValue = value;
+
+        if (from && value && value - from > 1) {
+          const startedAt = performance.now();
+
+          function animate(now) {
+            const progress = Math.min((now - startedAt) / 1000, 1);
+            const currentValue = Math.round(from + (value - from) * progress);
+            el.textContent = prefix + currentValue.toLocaleString();
+
+            if (progress < 1) {
+              el._animationFrame = requestAnimationFrame(animate);
+            }
           }
+
+          el._animationFrame = requestAnimationFrame(animate);
         } else {
           el.textContent =
             value !== undefined
               ? prefix + value.toLocaleString()
               : prefix + '-';
         }
-        el._lastValue = value;
       }
 
       function renderLeaderboard(tbodyEl, topList) {

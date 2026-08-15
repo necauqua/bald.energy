@@ -25,6 +25,11 @@ export class ElasticsearchCounter extends DurableObject<Env> {
   }
 
   async handleWebSocket(request: Request): Promise<Response> {
+    const requestUrl = new URL(request.url);
+    if (request.headers.get('Origin') !== requestUrl.origin) {
+      return new Response('WebSocket origin not allowed', { status: 403 });
+    }
+
     const upgradeHeader = request.headers.get('Upgrade');
     if (upgradeHeader?.toLowerCase() !== 'websocket') {
       return new Response('Expected websocket', { status: 400 });

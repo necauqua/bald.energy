@@ -26,7 +26,7 @@ export class ElasticsearchCounter extends DurableObject<Env> {
 
   async handleWebSocket(request: Request): Promise<Response> {
     const upgradeHeader = request.headers.get('Upgrade');
-    if (upgradeHeader !== 'websocket') {
+    if (upgradeHeader?.toLowerCase() !== 'websocket') {
       return new Response('Expected websocket', { status: 400 });
     }
 

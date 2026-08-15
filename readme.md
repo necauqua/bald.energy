@@ -1,10 +1,10 @@
-# bald.energy
+# bald.noit.ing
 
 A tiny meh cloudflare website that just spam-polls my elasticsearch server
 to count some peculiar things about [@DunkOrSlam](https://twitch.tv/dunkorslam)
 Twitch chat.
 
-Check it out at [bald.energy](https://bald.energy).
+Check it out at [bald.noit.ing](https://bald.noit.ing).
 
 ## License
 Like most of my things, if you for some reason copied noticeably large amounts

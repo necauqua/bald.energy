@@ -8,7 +8,7 @@ ELASTICSEARCH_INDEX = "twitch-chat-dunkorslam"
 
 [[routes]]
 custom_domain = true
-pattern = "bald.energy"
+pattern = "bald.noit.ing"
 
 [[durable_objects.bindings]]
 name = "ELASTICSEARCH_COUNTER"

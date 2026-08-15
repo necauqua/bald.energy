@@ -211,7 +211,18 @@ export default {
     const url = new URL(request.url);
 
     if (url.pathname === '/' || url.pathname === '/index.html') {
-      return new Response(index, { headers: { 'Content-Type': 'text/html' } });
+      return new Response(index, {
+        headers: {
+          'Cache-Control': 'public, max-age=300',
+          'Content-Security-Policy':
+            "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self' ws: wss:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+          'Content-Type': 'text/html; charset=utf-8',
+          'Permissions-Policy':
+            'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+          'Referrer-Policy': 'no-referrer',
+          'X-Content-Type-Options': 'nosniff',
+        },
+      });
     }
 
     if (url.pathname === '/websocket') {

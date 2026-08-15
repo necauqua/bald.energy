@@ -302,21 +302,35 @@
 
     const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
     let ws;
+    let reconnectTimer;
+
+    function clearReconnectTimer() {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = undefined;
+    }
 
     function disconnect() {
+      clearReconnectTimer();
       if (!ws) return;
-      ws.onclose = undefined;
-      ws.onerror = undefined;
-      ws.close();
+
+      const socket = ws;
       ws = undefined;
+      socket.onclose = undefined;
+      socket.onerror = undefined;
+      socket.close();
     }
 
     window.onbeforeunload = disconnect;
 
     function connect() {
+      clearReconnectTimer();
       disconnect();
-      ws = new WebSocket(`${protocol}//${location.host}/websocket`);
-      ws.onopen = () => hideStatus();
+
+      if (document.hidden) return;
+
+      const socket = new WebSocket(`${protocol}//${location.host}/websocket`);
+      ws = socket;
+      socket.onopen = () => hideStatus();
 
       function update(el, value, prefix = '') {
         cancelAnimationFrame(el._animationFrame);
@@ -367,7 +381,7 @@
         });
       }
 
-      ws.onmessage = (event) => {
+      socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
 
         if (data.type === 'update') {
@@ -395,13 +409,19 @@
         }
       };
 
-      ws.onclose = (e) => {
+      socket.onclose = (e) => {
+        if (ws !== socket) return;
+
+        ws = undefined;
         console.log('disconnected', e);
         showError('Disconnected - Reconnecting...');
-        setTimeout(connect, 3000);
+        reconnectTimer = setTimeout(() => {
+          reconnectTimer = undefined;
+          if (!document.hidden) connect();
+        }, 3000);
       };
 
-      ws.onerror = (e) => {
+      socket.onerror = (e) => {
         console.log('connection error', e);
         showError('Connection Error');
       };
